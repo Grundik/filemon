@@ -91,7 +91,7 @@ class Folder extends Entry {
 
   protected function _findEntry($haystack, $entry) {
     foreach ($haystack as $v) {
-      if ($v->getName()==$entry->getName()) {
+      if ($v->getName() === $entry->getName()) {
         return $v;
       }
     }
