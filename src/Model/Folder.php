@@ -153,14 +153,15 @@ class Folder extends Entry {
     if (null===$entries) {
       return false;
     }
-    $isUpdated = $this->_updateList($entries[0], $files, $em);
-    $isUpdated = $this->_updateList($entries[1], $folders, $em) || $isUpdated;
-    if ($isUpdated) {
+    if ($this->_updateList($entries[0], $files, $em)) {
       echo "...saving status".PHP_EOL;
       $em->flush();
-      $isUpdated = false;
     }
-    return $isUpdated;
+    if ($this->_updateList($entries[1], $folders, $em)) {
+      echo "...saving status".PHP_EOL;
+      $em->flush();
+    }
+    return false;
   }
 
   public function toJson($level=1) {
