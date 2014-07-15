@@ -42,12 +42,18 @@ class Application {
       case 'update':
         $this->_scanPath(isset($opts['path'])?$opts['path']:null);
         break;
+      case 'json':
+        $this->_toJson(isset($opts['path'])?$opts['path']:null);
+        break;
+      case 'xml':
+        $this->_toXml(isset($opts['path'])?$opts['path']:null);
+        break;
       default:
         throw new \Exception("Unknown mode: {$opts['mode']}");
     }
   }
 
-  protected function _scanPath($path) {
+  protected function _eachPath($path, $callback) {
     $repo = $this->_entityMgr->getRepository('Filemon\\Model\\Root');
     $criteria = array('active'=>1);
     if (null!==$path) {
@@ -55,9 +61,34 @@ class Application {
     }
     $roots = $repo->findBy($criteria);
     foreach ($roots as $root) {
-      $root->scan($this->_entityMgr);
+      $callback($root);
     }
     $this->_entityMgr->flush();
+  }
+
+  protected function _scanPath($path) {
+    $this->_eachPath($path, function($root){
+      $root->scan($this->_entityMgr);
+    });
+  }
+
+  protected function _toJson($path) {
+    \Filemon\printLine("[");
+    $first = true;
+    $this->_eachPath($path, function ($root) use ($first) {
+      if (!$first) {
+        \Filemon\printLine(",");
+      }
+      $root->toJson(1);
+      $first = false;
+    });
+    \Filemon\printLine("]");
+  }
+
+  protected function _toXml($path) {
+    $this->_eachPath($path, function ($root){
+      $root->toXml(1);
+    });
   }
 
   protected function _addPath($path) {
@@ -86,4 +117,17 @@ class Application {
   public function runCli() {
     return \Doctrine\ORM\Tools\Console\ConsoleRunner::createHelperSet($this->_entityMgr);
   }
+}
+
+function printLine($msg, $level=0) {
+  if ($level) {
+    $pad = str_repeat('  ', $level);
+  } else {
+    $pad = '';
+  }
+  echo $pad.$msg.PHP_EOL;
+}
+
+function jsonEncode($var) {
+  return json_encode($var, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
 }

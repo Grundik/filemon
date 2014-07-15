@@ -143,4 +143,28 @@ class Folder extends Entry {
     }
     $em->flush();
   }
+
+  public function toJson($level=1) {
+    $first = true;
+    \Filemon\printLine('{', $level);
+    $level++;
+    \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
+    \Filemon\printLine('"type": "folder",', $level);
+    \Filemon\printLine('"items": [', $level);
+    foreach ($this->getChilds() as $folder) {
+      if (!$first) {
+        \Filemon\printLine(',', $level);
+      }
+      $folder->toJson($level);
+      $first = false;
+    }
+    foreach ($this->getFiles() as $file) {
+      if (!$first) {
+        \Filemon\printLine(',', $level);
+      }
+      $file->toJson($level);
+      $first = false;
+    }
+    \Filemon\printLine('}', $level-1);
+  }
 }

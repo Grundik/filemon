@@ -51,15 +51,22 @@ class Root {
     $this->folder = $folder;
   }
 
-  public function scan(\Doctrine\ORM\EntityManager $em) {
+  protected function _getFolder() {
     $dirname = $this->getPath();
     $mainfolder = $this->getFolder();
     if (!$mainfolder) {
       $mainfolder = new Folder();
-      $mainfolder->setName($basename);
+      $mainfolder->setName($dirname);
       $this->setFolder($mainfolder);
     }
     $mainfolder->setRootPath($dirname);
-    $mainfolder->scan($em);
+    return $mainfolder;
+  }
+  public function scan(\Doctrine\ORM\EntityManager $em) {
+    $this->_getFolder()->scan($em);
+  }
+
+  public function toJson($level=1) {
+    $this->_getFolder()->toJson($level);
   }
 }

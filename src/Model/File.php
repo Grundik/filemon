@@ -31,6 +31,12 @@ class File extends Entry {
 
   /**
    * @var string
+   * @Column(type="string", length=40)
+   */
+  protected $sha1;
+
+  /**
+   * @var string
    * @Column(type="string", length=64)
    */
   protected $sha256;
@@ -105,5 +111,23 @@ class File extends Entry {
       return;
     }
     $this->hash();
+  }
+
+
+  public function toJson($level=1) {
+    \Filemon\printLine('{', $level);
+    $level++;
+    \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
+    \Filemon\printLine('"type": "file",', $level);
+    \Filemon\printLine('"size": '.$this->size.',', $level);
+    \Filemon\printLine('"mtime": '.$this->mtime.',', $level);
+    \Filemon\printLine('"ctime": '.$this->ctime.',', $level);
+    \Filemon\printLine('"tth": "'.$this->tth.'",', $level);
+    \Filemon\printLine('"md5": "'.$this->md5.'",', $level);
+    \Filemon\printLine('"crc32": "'.$this->crc32.'",', $level);
+    \Filemon\printLine('"sha1": "'.$this->sha1.'",', $level);
+    \Filemon\printLine('"sha256": "'.$this->sha256.'",', $level);
+    \Filemon\printLine('"sha3-256": "'.$this->sha3.'"', $level);
+    \Filemon\printLine('}', $level-1);
   }
 }
