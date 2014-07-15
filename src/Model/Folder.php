@@ -116,12 +116,11 @@ class Folder extends Entry {
     $scanTime = 0;
     foreach ($current as $entry) {
       $k = $this->_findEntry($saved, $entry);
-      if ($k) {
-        $k->_found = true;
-      } else {
+      if (!$k) {
         $k = $entry;
         $entry = null;
       }
+      $k->_found = true;
       $t = time();
       $isUpdated = $k->doUpdate($entry, $this, $em) || $isUpdated;
       $scanTime += time()-$t;
