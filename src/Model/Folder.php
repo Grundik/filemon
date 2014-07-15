@@ -101,7 +101,7 @@ class Folder extends Entry {
     if (null===$entries) {
       return;
     }
-    $now = time();
+    $hash_time = 0;
     foreach ($entries as $entry) {
       $found = null;
       if ($entry instanceof Folder) {
@@ -118,6 +118,7 @@ class Folder extends Entry {
       } elseif ($entry instanceof File) {
         $entry->setRootPath($this->root_path);
         $k = $this->_findEntry($files, $entry);
+        $now = time();
         if (null===$k) {
           echo "new file {$entry->getName()}".PHP_EOL;
           $this->addFile($entry);
@@ -128,15 +129,16 @@ class Folder extends Entry {
           $entry->setRootPath($this->root_path);
           $entry->update($entry);
         }
+        $hash_time += time() - $now;
       }
       $entry->_found = true;
       if ($entry->getDeleted()) {
         echo "...undeleted".PHP_EOL;
         $entry->setDeleted(null);
       }
-      if ($now + 5*60 < time()) {
+      if ($hash_time > 5*60) {
         $em->flush();
-        $now = time();
+        $hash_time = 0;
         echo "...saving intermediate status".PHP_EOL;
       }
     }
