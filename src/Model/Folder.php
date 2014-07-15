@@ -172,6 +172,7 @@ class Folder extends Entry {
       $file->toJson($level);
       $first = false;
     }
+    \Filemon\printLine(']', $level);
     \Filemon\printLine('}', $level-1);
   }
 }
