@@ -101,6 +101,7 @@ class Folder extends Entry {
     if (null===$entries) {
       return;
     }
+    $now = time();
     foreach ($entries as $entry) {
       $found = null;
       if ($entry instanceof Folder) {
@@ -132,6 +133,11 @@ class Folder extends Entry {
       if ($entry->getDeleted()) {
         echo "...undeleted".PHP_EOL;
         $entry->setDeleted(null);
+      }
+      if ($now + 5*60 < time()) {
+        $em->flush();
+        $now = time();
+        echo "...saving intermediate status".PHP_EOL;
       }
     }
     $now = time();
