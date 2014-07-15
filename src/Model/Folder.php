@@ -90,6 +90,9 @@ class Folder extends Entry {
   }
 
   public function scan(\Doctrine\ORM\EntityManager $em) {
+    if (!$this->root_path) {
+      throw new \Exception('Internal error: root path not set');
+    }
     $folders = $this->getChilds();
     $files = $this->getFiles();
     $entries = $this->_getDirStat($this->root_path);
@@ -119,6 +122,7 @@ class Folder extends Entry {
         } else {
           echo "old file {$entry->getName()}".PHP_EOL;
           $entry = $files[$k];
+          $entry->setRootPath($this->root_path);
           $entry->update($entry);
         }
       }

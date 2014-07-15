@@ -105,8 +105,13 @@ class File extends Entry {
       'AICH'  => 'aich',
       'BTIH'  => 'btih',
     );
+    if (!$this->root_path) {
+      throw new \Exception('Internal error: root path not set');
+    }
     $cwd = getcwd();
-    chdir($this->root_path);
+    if (!chdir($this->root_path)) {
+      echo "Unable chdir into {$this->root_path}".PHP_EOL;
+    }
 
     $result = null;
     $status = null;
@@ -128,7 +133,10 @@ class File extends Entry {
   }
 
   public function update(File $entry) {
-    if ($this->mtime == $entry->mtime && $this->getSize() == $entry->getSize()) {
+    if ($this->mtime == $entry->mtime && $this->getSize() == $entry->getSize() &&
+        $this->btih
+       )
+    {
       return;
     }
     $this->hash();
