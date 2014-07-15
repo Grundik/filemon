@@ -1,0 +1,9 @@
+<?php
+
+return array(
+  'db' => array(
+    'driver' => 'pdo_sqlite',
+    'charset'=> 'utf-8',
+    'path' => APPLICATION_PATH . '/db.sqlite',
+  )
+);
