@@ -71,6 +71,12 @@ class File extends Entry {
    */
   protected $ed2k;
 
+  /**
+   * @var string
+   * @Column(type="string", length=32)
+   */
+  protected $btih;
+
   public function setSize($size) {
     $this->size = $size;
   }
@@ -97,6 +103,7 @@ class File extends Entry {
       'SHA3-256' => 'sha3',
       'ED2K'  => 'ed2k',
       'AICH'  => 'aich',
+      'BTIH'  => 'btih',
     );
     $cwd = getcwd();
     chdir($this->root_path);
@@ -104,7 +111,7 @@ class File extends Entry {
     $result = null;
     $status = null;
     echo "...hashing".PHP_EOL;
-    exec('rhash -TMCHAE --sha256 --sha3-256 --bsd -- '.escapeshellarg($this->getName()), $result, $status);
+    exec('rhash -TMCHAE --sha256 --sha3-256 --bsd --btih -- '.escapeshellarg($this->getName()), $result, $status);
     if (!$status) {
       foreach ($result as $line) {
         if (preg_match('@^(\\S+)\s.* = (.+)$@', $line, $matches)) {
@@ -141,6 +148,7 @@ class File extends Entry {
                        '"sha256": "'.$this->sha256.'", '.
                        '"sha3-256": "'.$this->sha3.'", '.
                        '"aich": "'.$this->aich.'", '.
+                       '"btih": "'.$this->btih.'", '.
                        '"ed2k": "'.$this->ed2k.'"', $level);
     \Filemon\printLine('}', $level-1);
   }
