@@ -132,6 +132,7 @@ class Folder extends Entry {
       if ($scanTime>5*60) {
         echo "...saving intermediate status".PHP_EOL;
         $em->flush();
+        $scanTime = 0;
         $isUpdated = false;
       }
     }
