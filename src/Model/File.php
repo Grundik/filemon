@@ -59,6 +59,18 @@ class File extends Entry {
    */
   protected $crc32;
 
+  /**
+   * @var string
+   * @Column(type="string", length=32)
+   */
+  protected $aich;
+
+  /**
+   * @var string
+   * @Column(type="string", length=32)
+   */
+  protected $ed2k;
+
   public function setSize($size) {
     $this->size = $size;
   }
@@ -83,6 +95,8 @@ class File extends Entry {
       'TTH'   => 'tth',
       'SHA-256'  => 'sha256',
       'SHA3-256' => 'sha3',
+      'ED2K'  => 'ed2k',
+      'AICH'  => 'aich',
     );
     $cwd = getcwd();
     chdir($this->root_path);
@@ -90,7 +104,7 @@ class File extends Entry {
     $result = null;
     $status = null;
     echo "...hashing".PHP_EOL;
-    exec('rhash -TMCH --sha256 --sha3-256 --bsd -- '.escapeshellarg($this->getName()), $result, $status);
+    exec('rhash -TMCHAE --sha256 --sha3-256 --bsd -- '.escapeshellarg($this->getName()), $result, $status);
     if (!$status) {
       foreach ($result as $line) {
         if (preg_match('@^(\\S+)\s.* = (.+)$@', $line, $matches)) {
@@ -118,16 +132,16 @@ class File extends Entry {
     \Filemon\printLine('{', $level);
     $level++;
     \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
-    \Filemon\printLine('"type": "file",', $level);
-    \Filemon\printLine('"size": '.$this->size.',', $level);
-    \Filemon\printLine('"mtime": '.$this->mtime.',', $level);
-    \Filemon\printLine('"ctime": '.$this->ctime.',', $level);
-    \Filemon\printLine('"tth": "'.$this->tth.'",', $level);
-    \Filemon\printLine('"md5": "'.$this->md5.'",', $level);
-    \Filemon\printLine('"crc32": "'.$this->crc32.'",', $level);
-    \Filemon\printLine('"sha1": "'.$this->sha1.'",', $level);
-    \Filemon\printLine('"sha256": "'.$this->sha256.'",', $level);
-    \Filemon\printLine('"sha3-256": "'.$this->sha3.'"', $level);
+    \Filemon\printLine('"type": "file", "size": '.$this->size.',', $level);
+    \Filemon\printLine('"mtime": '.$this->mtime.', "ctime": '.$this->ctime.',', $level);
+    \Filemon\printLine('"tth": "'.$this->tth.'", '.
+                       '"md5": "'.$this->md5.'", '.
+                       '"crc32": "'.$this->crc32.'", '.
+                       '"sha1": "'.$this->sha1.'", '.
+                       '"sha256": "'.$this->sha256.'", '.
+                       '"sha3-256": "'.$this->sha3.'", '.
+                       '"aich": "'.$this->aich.'", '.
+                       '"ed2k": "'.$this->ed2k.'"', $level);
     \Filemon\printLine('}', $level-1);
   }
 }
