@@ -154,6 +154,9 @@ class Folder extends Entry {
     $level++;
     \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
     \Filemon\printLine('"type": "folder",', $level);
+    if ($this->deleted) {
+      \Filemon\printLine('"deleted": '.$this->deleted.',', $level);
+    }
     \Filemon\printLine('"items": [', $level);
     foreach ($this->getChilds() as $folder) {
       if (!$first) {

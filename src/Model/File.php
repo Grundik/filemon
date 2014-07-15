@@ -148,6 +148,9 @@ class File extends Entry {
     $level++;
     \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
     \Filemon\printLine('"type": "file", "size": '.$this->size.',', $level);
+    if ($this->deleted) {
+      \Filemon\printLine('"deleted": '.$this->deleted.',', $level);
+    }
     \Filemon\printLine('"mtime": '.$this->mtime.', "ctime": '.$this->ctime.',', $level);
     \Filemon\printLine('"tth": "'.$this->tth.'", '.
                        '"md5": "'.$this->md5.'", '.
