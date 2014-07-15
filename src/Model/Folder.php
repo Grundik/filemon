@@ -8,11 +8,13 @@ class Folder extends Entry {
 
   /**
    * @OneToMany(targetEntity="Folder", mappedBy="parent", cascade="all")
+   * @OrderBy({"name" = "ASC"})
    */
   protected $childs;
 
   /**
    * @OneToMany(targetEntity="File", mappedBy="parent", cascade="all")
+   * @OrderBy({"name" = "ASC"})
    */
   protected $files;
 
