@@ -150,7 +150,7 @@ class File extends Entry {
     $isUpdated = false;
     $this->setRootPath($container->root_path);
     if ($oldInstance) {
-      echo "old file {$this->getName()}".PHP_EOL;
+      echo "known file {$this->getName()}".PHP_EOL;
       $isUpdated = $this->update($oldInstance);
     } else {
       echo "new file {$this->getName()}".PHP_EOL;

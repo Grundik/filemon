@@ -101,7 +101,7 @@ class Folder extends Entry {
   public function doUpdate($oldInstance, Folder $container, \Doctrine\ORM\EntityManager $em) {
     $isUpdated = false;
     if ($oldInstance) {
-      echo "old folder {$this->getName()}".PHP_EOL;
+      echo "known folder {$this->getName()}".PHP_EOL;
     } else {
       echo "new folder {$this->getName()}".PHP_EOL;
       $container->addChild($this);
