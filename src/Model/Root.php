@@ -69,4 +69,8 @@ class Root {
   public function toJson($level=1) {
     $this->_getFolder()->toJson($level);
   }
+
+  public function toXml($level=1) {
+    $this->_getFolder()->toXml($level);
+  }
 }

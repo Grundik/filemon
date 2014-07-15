@@ -175,4 +175,15 @@ class Folder extends Entry {
     \Filemon\printLine(']', $level);
     \Filemon\printLine('}', $level-1);
   }
+
+  public function toXml($level=1) {
+    \Filemon\printLine('<Directory Name="'.\Filemon\xmlEncode($this->getName()).'">', $level);
+    foreach ($this->getChilds() as $folder) {
+      $folder->toXml($level+1);
+    }
+    foreach ($this->getFiles() as $file) {
+      $file->toXml($level+1);
+    }
+    \Filemon\printLine('</Directory>', $level);
+  }
 }

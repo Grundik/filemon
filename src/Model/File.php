@@ -163,4 +163,30 @@ class File extends Entry {
                        '"ed2k": "'.$this->ed2k.'"', $level);
     \Filemon\printLine('}', $level-1);
   }
+
+  public function toXml($level=1) {
+    $data = array(
+      'Name' => $this->getName(),
+      'Size' => $this->getSize(),
+      'TTH'  => $this->tth,
+      'CTime'=> date('c', $this->ctime),
+      'MTime'=> date('c', $this->mtime),
+      'MD5'  => $this->md5,
+      'CRC32'=> $this->crc32,
+      'SHA1' => $this->sha1,
+      'SHA256' => $this->sha256,
+      'SHA3-256' => $this->sha3,
+      'AICH' => $this->aich,
+      'BTIH' => $this->btih,
+      'ED2K' => $this->ed2k,
+    );
+    $prefix = '<File ';
+    $suffix = ' />';
+    if ($this->deleted) {
+      $data['Deleted'] = date('c', $this->deleted);
+      $prefix = "<!-- $prefix";
+      $suffix = "$suffix -->";
+    }
+    \Filemon\printLine($prefix.\Filemon\xmlEncode($data).$suffix, $level);
+  }
 }

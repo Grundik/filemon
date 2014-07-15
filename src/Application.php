@@ -86,9 +86,12 @@ class Application {
   }
 
   protected function _toXml($path) {
+    \Filemon\printLine('<?xml version="1.0" encoding="utf-8" standalone="yes"?>');
+    \Filemon\printLine('<FileListing Version="1" Base="/" Generator="FileMon 0.1">');
     $this->_eachPath($path, function ($root){
       $root->toXml(1);
     });
+    \Filemon\printLine('</FileListing>');
   }
 
   protected function _addPath($path) {
@@ -130,4 +133,16 @@ function printLine($msg, $level=0) {
 
 function jsonEncode($var) {
   return json_encode($var, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+}
+
+function xmlEncode($var) {
+  if (is_array($var)) {
+    $str = array();
+    foreach ($var as $key=>$value) {
+      $str[] = $key.'="'.htmlspecialchars($value).'"';
+    }
+    return join(' ', $str);
+  } else {
+    return htmlspecialchars($var);
+  }
 }
