@@ -137,11 +137,29 @@ class File extends Entry {
         $this->btih
        )
     {
-      return;
+      return false;
     }
     $this->hash();
+    $this->setMtime($entry->mtime);
+    $this->setCtime($entry->ctime);
+    $this->setSize($entry->getSize());
+    return true;
   }
 
+  public function doUpdate($oldInstance, Folder $container, \Doctrine\ORM\EntityManager $em) {
+    $isUpdated = false;
+    $this->setRootPath($container->root_path);
+    if ($oldInstance) {
+      echo "old file {$this->getName()}".PHP_EOL;
+      $isUpdated = $this->update($oldInstance);
+    } else {
+      echo "new file {$this->getName()}".PHP_EOL;
+      $container->addFile($this);
+      $this->hash();
+      $isUpdated = true;
+    }
+    return $isUpdated;
+  }
 
   public function toJson($level=1) {
     \Filemon\printLine('{', $level);

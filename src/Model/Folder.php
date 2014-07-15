@@ -60,7 +60,8 @@ class Folder extends Entry {
     if (!$dir) {
       return null;
     }
-    $entries = array();
+    $files = array();
+    $folders = array();
     while (false !== ($entry = $dir->read())) {
       if ('.'==$entry[0]) {
         continue;
@@ -68,27 +69,78 @@ class Folder extends Entry {
       $stat = stat($entry);
       if (is_dir($entry)) {
         $file = new Folder();
+        $folders[] = $file;
       } else {
         $file = new File();
         $file->setSize($stat['size']);
         $file->setMtime($stat['mtime']);
         $file->setCtime($stat['ctime']);
+        $files[] = $file;
       }
       $file->setName($entry);
-      $entries[] = $file;
     }
     $dir->close();
     chdir($cwd);
-    return $entries;
+    return array($files, $folders);
   }
 
   protected function _findEntry($haystack, $entry) {
-    foreach ($haystack as $k=>$v) {
+    foreach ($haystack as $v) {
       if ($v->getName()==$entry->getName()) {
-        return $k;
+        return $v;
       }
     }
     return null;
+  }
+
+  public function doUpdate($oldInstance, Folder $container, \Doctrine\ORM\EntityManager $em) {
+    $isUpdated = false;
+    if ($oldInstance) {
+      echo "old folder {$this->getName()}".PHP_EOL;
+    } else {
+      echo "new folder {$this->getName()}".PHP_EOL;
+      $container->addChild($this);
+      $isUpdated = true;
+    }
+    $this->setRootPath($container->root_path.'/'.$this->getName());
+    return $this->scan($em) || $isUpdated;
+  }
+
+  protected function _updateList($current, $saved, \Doctrine\ORM\EntityManager $em) {
+    $isUpdated = false;
+    $scanTime = 0;
+    foreach ($current as $entry) {
+      $k = $this->_findEntry($saved, $entry);
+      if ($k) {
+        $k->_found = true;
+      } else {
+        $k = $entry;
+        $entry = null;
+      }
+      $t = time();
+      $isUpdated = $k->doUpdate($entry, $this, $em) || $isUpdated;
+      $scanTime += time()-$t;
+      if ($k->getDeleted()) {
+        echo "...undeleted".PHP_EOL;
+        $k->setDeleted(null);
+        $isUpdated = true;
+      }
+      if ($scanTime>5*60) {
+        echo "...saving intermediate status".PHP_EOL;
+        $em->flush();
+        $isUpdated = false;
+      }
+    }
+    $now = time();
+    foreach ($saved as $f) {
+      if (!$f->_found && !$f->getDeleted()) {
+        $type = $f instanceof Folder ? 'folder' : 'file';
+        echo "Lost $type {$f->getName()}".PHP_EOL;
+        $f->setDeleted($now);
+        $isUpdated = true;
+      }
+    }
+    return $isUpdated;
   }
 
   public function scan(\Doctrine\ORM\EntityManager $em) {
@@ -99,63 +151,16 @@ class Folder extends Entry {
     $files = $this->getFiles();
     $entries = $this->_getDirStat($this->root_path);
     if (null===$entries) {
-      return;
+      return false;
     }
-    $hash_time = 0;
-    foreach ($entries as $entry) {
-      $found = null;
-      if ($entry instanceof Folder) {
-        $k = $this->_findEntry($folders, $entry);
-        if (null===$k) {
-          echo "new folder {$entry->getName()}".PHP_EOL;
-          $this->addChild($entry);
-        } else {
-          echo "old folder {$entry->getName()}".PHP_EOL;
-          $entry = $folders[$k];
-        }
-        $entry->setRootPath($this->root_path.'/'.$entry->getName());
-        $entry->scan($em);
-      } elseif ($entry instanceof File) {
-        $entry->setRootPath($this->root_path);
-        $k = $this->_findEntry($files, $entry);
-        $now = time();
-        if (null===$k) {
-          echo "new file {$entry->getName()}".PHP_EOL;
-          $this->addFile($entry);
-          $entry->hash();
-        } else {
-          echo "old file {$entry->getName()}".PHP_EOL;
-          $entry = $files[$k];
-          $entry->setRootPath($this->root_path);
-          $entry->update($entry);
-        }
-        $hash_time += time() - $now;
-      }
-      $entry->_found = true;
-      if ($entry->getDeleted()) {
-        echo "...undeleted".PHP_EOL;
-        $entry->setDeleted(null);
-      }
-      if ($hash_time > 5*60) {
-        $em->flush();
-        $hash_time = 0;
-        echo "...saving intermediate status".PHP_EOL;
-      }
+    $isUpdated = $this->_updateList($entries[0], $files, $em);
+    $isUpdated = $this->_updateList($entries[1], $folders, $em) || $isUpdated;
+    if ($isUpdated) {
+      echo "...saving status".PHP_EOL;
+      $em->flush();
+      $isUpdated = false;
     }
-    $now = time();
-    foreach ($folders as $f) {
-      if (!$f->_found && !$f->getDeleted()) {
-        echo "Lost folder {$f->getName()}".PHP_EOL;
-        $f->setDeleted($now);
-      }
-    }
-    foreach ($files as $f) {
-      if (!$f->_found && !$f->getDeleted()) {
-        echo "Lost file {$f->getName()}".PHP_EOL;
-        $f->setDeleted($now);
-      }
-    }
-    $em->flush();
+    return $isUpdated;
   }
 
   public function toJson($level=1) {
