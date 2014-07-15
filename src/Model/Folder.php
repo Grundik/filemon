@@ -54,18 +54,24 @@ class Folder extends Entry {
       echo "$path is not readable directory".PHP_EOL;
       return null;
     }
-    $cwd = getcwd();
-    chdir($path);
     $dir = dir($path);
     if (!$dir) {
       return null;
     }
     $files = array();
     $folders = array();
+    $direntries = array();
     while (false !== ($entry = $dir->read())) {
       if ('.'==$entry[0]) {
         continue;
       }
+      $direntries[] = $entry;
+    }
+    $dir->close();
+    $cwd = getcwd();
+    chdir($path);
+    sort($direntries, SORT_STRING);
+    foreach ($direntries as $entry) {
       $stat = stat($entry);
       if (is_dir($entry)) {
         $file = new Folder();
@@ -79,7 +85,6 @@ class Folder extends Entry {
       }
       $file->setName($entry);
     }
-    $dir->close();
     chdir($cwd);
     return array($files, $folders);
   }
