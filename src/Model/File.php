@@ -164,7 +164,7 @@ class File extends Entry {
     \Filemon\printLine('}', $level-1);
   }
 
-  public function toXml($level=1) {
+  public function toXml($level=1, $inDeletedFolder=false) {
     $data = array(
       'Name' => $this->getName(),
       'Size' => $this->getSize(),
@@ -184,8 +184,10 @@ class File extends Entry {
     $suffix = ' />';
     if ($this->deleted) {
       $data['Deleted'] = date('c', $this->deleted);
-      $prefix = "<!-- $prefix";
-      $suffix = "$suffix -->";
+      if (!$inDeletedFolder) {
+        $prefix = "<!-- $prefix";
+        $suffix = "$suffix -->";
+      }
     }
     \Filemon\printLine($prefix.\Filemon\xmlEncode($data).$suffix, $level);
   }

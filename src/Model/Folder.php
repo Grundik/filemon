@@ -176,14 +176,27 @@ class Folder extends Entry {
     \Filemon\printLine('}', $level-1);
   }
 
-  public function toXml($level=1) {
-    \Filemon\printLine('<Directory Name="'.\Filemon\xmlEncode($this->getName()).'">', $level);
+  public function toXml($level=1, $inDeletedFolder=false) {
+    $prefix = '<Directory ';
+    $suffix = '</Directory>';
+    $data = array(
+      'Name' => $this->getName(),
+    );
+    if ($this->deleted) {
+      $data['Deleted'] = date('c', $this->deleted);
+      if (!$inDeletedFolder) {
+        $prefix = '<!-- '.$prefix;
+        $suffix = $suffix.' -->';
+      }
+      $inDeletedFolder = true;
+    }
+    \Filemon\printLine($prefix.\Filemon\xmlEncode($data).'>', $level);
     foreach ($this->getChilds() as $folder) {
-      $folder->toXml($level+1);
+      $folder->toXml($level+1, $inDeletedFolder);
     }
     foreach ($this->getFiles() as $file) {
-      $file->toXml($level+1);
+      $file->toXml($level+1, $inDeletedFolder);
     }
-    \Filemon\printLine('</Directory>', $level);
+    \Filemon\printLine($suffix, $level);
   }
 }
