@@ -161,10 +161,16 @@ class Folder extends Entry {
     if ($this->_updateList($entries[0], $files, $em)) {
       echo "...saving status".PHP_EOL;
       $em->flush();
+      foreach ($files as $file) {
+        $em->detach($file);
+      }
     }
     if ($this->_updateList($entries[1], $folders, $em)) {
       echo "...saving status".PHP_EOL;
       $em->flush();
+      foreach ($folders as $folder) {
+        $em->detach($folder);
+      }
     }
     return false;
   }
