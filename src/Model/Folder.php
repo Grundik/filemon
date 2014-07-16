@@ -119,6 +119,7 @@ class Folder extends Entry {
       if (!$k) {
         $k = $entry;
         $entry = null;
+        $em->persist($entry);
       }
       $k->_found = true;
       $t = time();
