@@ -64,6 +64,7 @@ class Root {
   }
   public function scan(\Doctrine\ORM\EntityManager $em) {
     $this->_getFolder()->scan($em);
+    $em->flush();
   }
 
   public function toJson($level=1) {

@@ -7,13 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Folder extends Entry {
 
   /**
-   * @OneToMany(targetEntity="Folder", mappedBy="parent")
+   * @OneToMany(targetEntity="Folder", mappedBy="parent", cascade="all")
    * @OrderBy({"name" = "ASC"})
    */
   protected $childs;
 
   /**
-   * @OneToMany(targetEntity="File", mappedBy="parent")
+   * @OneToMany(targetEntity="File", mappedBy="parent", cascade="all")
    * @OrderBy({"name" = "ASC"})
    */
   protected $files;
@@ -160,19 +160,11 @@ class Folder extends Entry {
     }
     if ($this->_updateList($entries[0], $files, $em)) {
       echo "...saving status".PHP_EOL;
-      $em->flush();
-      foreach ($files as $file) {
-        $em->detach($file);
-      }
-      $this->files = null;
+      $em->flush($this);
     }
     if ($this->_updateList($entries[1], $folders, $em)) {
       echo "...saving status".PHP_EOL;
-      $em->flush();
-      foreach ($folders as $folder) {
-        $em->detach($folder);
-      }
-      $this->childs = null;
+      $em->flush($this);
     }
     return false;
   }
