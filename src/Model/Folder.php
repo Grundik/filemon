@@ -164,7 +164,7 @@ class Folder extends Entry {
       foreach ($files as $file) {
         $em->detach($file);
       }
-      //$this->files = null;
+      $this->files = null;
     }
     if ($this->_updateList($entries[1], $folders, $em)) {
       echo "...saving status".PHP_EOL;
@@ -172,7 +172,7 @@ class Folder extends Entry {
       foreach ($folders as $folder) {
         $em->detach($folder);
       }
-      //$this->childs = null;
+      $this->childs = null;
     }
     return false;
   }
