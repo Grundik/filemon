@@ -52,10 +52,13 @@ class Application {
         echo $this->_findFile($opts)->getEd2kLink().PHP_EOL;
         break;
       case 'dc':
-        echo $this->_findFile($opts)->getDcMagnetLink().PHP_EOL;
+        echo $this->_findFile($opts)->getTthLink().PHP_EOL;
         break;
       case 'torrent':
         echo $this->_findFile($opts)->getTorrentLink().PHP_EOL;
+        break;
+      case 'magnet':
+        echo $this->_findFile($opts)->getMagnetLink().PHP_EOL;
         break;
       default:
         throw new \Exception("Unknown mode: {$opts['mode']}");
@@ -171,4 +174,8 @@ function xmlEncode($var) {
   } else {
     return htmlspecialchars($var);
   }
+}
+
+function hex2base32($hex) {
+  return Base32::encode(hex2bin($hex));
 }

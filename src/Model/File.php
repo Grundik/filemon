@@ -213,10 +213,21 @@ class File extends Entry {
   public function getEd2kLink() {
     return 'ed2k://|file|'.str_replace('+', '%20', urlencode($this->getName())).'|'.$this->getSize().'|'.$this->ed2k.'|h='.$this->aich.'|/';
   }
-  public function getDcMagnetLink() {
+  public function getTthLink() {
     return 'magnet:?xt=urn:tree:tiger:'.$this->tth.'&xl='.$this->getSize().'&dn='.str_replace('+', '%20', urlencode($this->getName()));
   }
   public function getTorrentLink() {
     return 'magnet:?xt=urn:btih:'.$this->btih.'&xl='.$this->getSize().'&dn='.str_replace('+', '%20', urlencode($this->getName()));
+  }
+  public function getMagnetLink() {
+    return 'magnet:?dn='.str_replace('+', '%20', urlencode($this->getName())).'&xl='.$this->getSize().
+             '&xt=urn:tree:tiger:'.$this->tth.
+             '&xt=urn:btih:'.$this->btih.
+             '&xt=urn:ed2k:'.$this->ed2k.
+             '&xt=urn:ed2khash:'.$this->ed2k.
+             '&xt=urn:sha1:'.\Filemon\hex2base32($this->sha1).
+             '&xt=urn:aich:'.$this->aich.
+             '&xt=urn:md5:'.$this->md5
+           ;
   }
 }
