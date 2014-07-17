@@ -211,7 +211,7 @@ class File extends Entry {
   }
 
   public function getEd2kLink() {
-    return 'ed2k://|file|'.urlencode($this->getName()).'|'.$this->getSize().'|'.$this->ed2k.'|h='.$this->aich.'|/';
+    return 'ed2k://|file|'.str_replace('+', '%20', urlencode($this->getName())).'|'.$this->getSize().'|'.$this->ed2k.'|h='.$this->aich.'|/';
   }
   public function getDcMagnetLink() {
     return 'magnet:?xt=urn:tree:tiger:'.$this->tth.'&xl='.$this->getSize().'&dn='.str_replace('+', '%20', urlencode($this->getName()));
