@@ -56,7 +56,7 @@ class Application {
         if (!$file) {
           throw new \Exception("File not found");
         }
-        echo $file->getEd2kLink();
+        echo $file->getEd2kLink().PHP_EOL;
         break;
       default:
         throw new \Exception("Unknown mode: {$opts['mode']}");
