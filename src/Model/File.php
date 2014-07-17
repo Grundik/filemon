@@ -209,4 +209,8 @@ class File extends Entry {
     }
     \Filemon\printLine($prefix.\Filemon\xmlEncode($data).$suffix, $level);
   }
+
+  public function getEd2kLink() {
+    return 'ed2k://|file|'.urlencode($this->getName()).'|'.$this->getSize().'|'.$this->ed2k.'|h='.$this->aich.'|/';
+  }
 }

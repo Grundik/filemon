@@ -19,7 +19,7 @@ class Application {
   }
 
   public function run() {
-    $opts = getopt('h::m', array('mode:', 'help', 'path:'));
+    $opts = getopt('h::m', array('mode:', 'help', 'path:', 'file:'));
     if (!isset($opts['mode'])) {
       $opts['mode'] = isset($opts['m'])?$opts['m']:'update';
     }
@@ -47,6 +47,16 @@ class Application {
         break;
       case 'xml':
         $this->_toXml(isset($opts['path'])?$opts['path']:null);
+        break;
+      case 'ed2k':
+        if (!isset($opts['file'])) {
+          throw new \Exception("File not specified");
+        }
+        $file = $this->_entityMgr->find('Filemon\\Model\\File', $opts['file']);
+        if (!$file) {
+          throw new \Exception("File not found");
+        }
+        echo $file->getEd2kLink();
         break;
       default:
         throw new \Exception("Unknown mode: {$opts['mode']}");
