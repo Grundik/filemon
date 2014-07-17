@@ -49,18 +49,34 @@ class Application {
         $this->_toXml(isset($opts['path'])?$opts['path']:null);
         break;
       case 'ed2k':
-        if (!isset($opts['file'])) {
-          throw new \Exception("File not specified");
-        }
-        $file = $this->_entityMgr->find('Filemon\\Model\\File', $opts['file']);
-        if (!$file) {
-          throw new \Exception("File not found");
-        }
-        echo $file->getEd2kLink().PHP_EOL;
+        $this->_findFile($opts)->getEd2kLink().PHP_EOL;
+        break;
+      case 'dc':
+        $this->_findFile($opts)->getDcMagnetLink().PHP_EOL;
+        break;
+      case 'torrent':
+        $this->_findFile($opts)->getTorrentLink().PHP_EOL;
         break;
       default:
         throw new \Exception("Unknown mode: {$opts['mode']}");
     }
+  }
+
+  /**
+   *
+   * @param array $opts
+   * @return \Filemon\Model\File
+   * @throws \Exception
+   */
+  protected function _findFile($opts) {
+    if (!isset($opts['file'])) {
+      throw new \Exception("File not specified");
+    }
+    $file = $this->_entityMgr->find('Filemon\\Model\\File', $opts['file']);
+    if (!$file) {
+      throw new \Exception("File not found");
+    }
+    return $file;
   }
 
   protected function _eachPath($path, $callback) {
