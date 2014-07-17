@@ -73,6 +73,10 @@ class Folder extends Entry {
     sort($direntries, SORT_STRING);
     foreach ($direntries as $entry) {
       $stat = stat($entry);
+      if (false===$stat) {
+        echo "...cannot stat file {$entry}, skipping".PHP_EOL;
+        continue;
+      }
       if (is_dir($entry)) {
         $file = new Folder();
         $folders[] = $file;
