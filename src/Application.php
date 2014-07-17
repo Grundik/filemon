@@ -49,13 +49,13 @@ class Application {
         $this->_toXml(isset($opts['path'])?$opts['path']:null);
         break;
       case 'ed2k':
-        $this->_findFile($opts)->getEd2kLink().PHP_EOL;
+        echo $this->_findFile($opts)->getEd2kLink().PHP_EOL;
         break;
       case 'dc':
-        $this->_findFile($opts)->getDcMagnetLink().PHP_EOL;
+        echo $this->_findFile($opts)->getDcMagnetLink().PHP_EOL;
         break;
       case 'torrent':
-        $this->_findFile($opts)->getTorrentLink().PHP_EOL;
+        echo $this->_findFile($opts)->getTorrentLink().PHP_EOL;
         break;
       default:
         throw new \Exception("Unknown mode: {$opts['mode']}");
