@@ -22,7 +22,7 @@ class Application {
 
   public function run() {
     global $LOG_LEVEL;
-    $opts = getopt('h::m:v:', array('mode:', 'help', 'path:', 'file:', 'verbose'));
+    $opts = getopt('h::m:v:', array('mode:', 'help', 'path:', 'file:', 'verbose:'));
     if (!isset($opts['mode'])) {
       $opts['mode'] = isset($opts['m'])?$opts['m']:'update';
     }
