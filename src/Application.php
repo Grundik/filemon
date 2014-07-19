@@ -5,6 +5,8 @@ namespace Filemon;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
+$LOG_LEVEL = 3;
+
 class Application {
 
   /**
@@ -19,10 +21,18 @@ class Application {
   }
 
   public function run() {
-    $opts = getopt('h::m', array('mode:', 'help', 'path:', 'file:'));
+    global $LOG_LEVEL;
+    $opts = getopt('h::m:v:', array('mode:', 'help', 'path:', 'file:', 'verbose'));
     if (!isset($opts['mode'])) {
       $opts['mode'] = isset($opts['m'])?$opts['m']:'update';
     }
+
+    if (isset($opts['v'])) {
+      $LOG_LEVEL = intval($opts['v']);
+    } elseif (isset($opts['verbose'])) {
+      $LOG_LEVEL = intval($opts['verbose']);
+    }
+
     switch ($opts['mode']) {
       case 'init':
         break;
@@ -151,7 +161,11 @@ class Application {
   }
 }
 
-function printLine($msg, $level=0) {
+function printLine($msg, $level=0, $verbosity=3) {
+  global $LOG_LEVEL;
+  if ($verbosity>$LOG_LEVEL) {
+    return;
+  }
   if ($level) {
     $pad = str_repeat('  ', $level);
   } else {

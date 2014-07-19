@@ -110,12 +110,12 @@ class File extends Entry {
     }
     $cwd = getcwd();
     if (!chdir($this->root_path)) {
-      echo "Unable chdir into {$this->root_path}".PHP_EOL;
+      \Filemon\printLine("Unable chdir into {$this->root_path}");
     }
 
     $result = null;
     $status = null;
-    echo "...hashing".PHP_EOL;
+    \Filemon\printLine("...hashing", 0, 4);
     exec('rhash -TMCHAE --sha256 --sha3-256 --bsd --btih -- '.escapeshellarg($this->getName()), $result, $status);
     if (!$status) {
       foreach ($result as $line) {
@@ -150,10 +150,10 @@ class File extends Entry {
     $isUpdated = false;
     $this->setRootPath($container->root_path);
     if ($oldInstance) {
-      echo "known file {$this->getName()}".PHP_EOL;
+      \Filemon\printLine("known file {$this->getName()}", 0, 5);
       $isUpdated = $this->update($oldInstance);
     } else {
-      echo "new file {$this->getName()}".PHP_EOL;
+      \Filemon\printLine("new file {$this->getName()}", 0, 4);
       $container->addFile($this);
       $this->hash();
       $isUpdated = true;

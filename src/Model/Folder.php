@@ -51,7 +51,7 @@ class Folder extends Entry {
 
   protected function _getDirStat($path) {
     if (!file_exists($path) || !is_dir($path) || !is_readable($path)) {
-      echo "$path is not readable directory".PHP_EOL;
+      \Filemon\printLine("$path is not readable directory");
       return null;
     }
     $dir = dir($path);
@@ -72,9 +72,9 @@ class Folder extends Entry {
     chdir($path);
     sort($direntries, SORT_STRING);
     foreach ($direntries as $entry) {
-      $stat = stat($entry);
+      $stat = @stat($entry);
       if (false===$stat) {
-        echo "...cannot stat file {$entry}, skipping".PHP_EOL;
+        \Filemon\printLine("...cannot stat file {$entry}, skipping");
         continue;
       }
       if (is_dir($entry)) {
@@ -105,9 +105,9 @@ class Folder extends Entry {
   public function doUpdate($oldInstance, Folder $container, \Doctrine\ORM\EntityManager $em) {
     $isUpdated = false;
     if ($oldInstance) {
-      echo "known folder {$this->getName()}".PHP_EOL;
+      \Filemon\printLine("known folder {$this->getName()}", 0, 5);
     } else {
-      echo "new folder {$this->getName()}".PHP_EOL;
+      \Filemon\printLine("new folder {$this->getName()}", 0, 4);
       $container->addChild($this);
       $isUpdated = true;
     }
@@ -130,12 +130,12 @@ class Folder extends Entry {
       $isUpdated = $k->doUpdate($entry, $this, $em) || $isUpdated;
       $scanTime += time()-$t;
       if ($k->getDeleted()) {
-        echo "...undeleted".PHP_EOL;
+        \Filemon\printLine("...undeleted", 0, 4);
         $k->setDeleted(null);
         $isUpdated = true;
       }
       if ($scanTime>5*60) {
-        echo "...saving intermediate status".PHP_EOL;
+        \Filemon\printLine("...saving intermediate status", 0, 6);
         $em->flush($this);
         $scanTime = 0;
         $isUpdated = false;
@@ -145,7 +145,7 @@ class Folder extends Entry {
     foreach ($saved as $f) {
       if (!$f->_found && !$f->getDeleted()) {
         $type = $f instanceof Folder ? 'folder' : 'file';
-        echo "Lost $type {$f->getName()}".PHP_EOL;
+        \Filemon\printLine("Lost $type {$f->getName()}", 0, 4);
         $f->setDeleted($now);
         $isUpdated = true;
       }
@@ -164,11 +164,11 @@ class Folder extends Entry {
       return false;
     }
     if ($this->_updateList($entries[0], $files, $em)) {
-      echo "...saving status".PHP_EOL;
+      \Filemon\printLine("...saving status", 0, 6);
       $em->flush($this);
     }
     if ($this->_updateList($entries[1], $folders, $em)) {
-      echo "...saving status".PHP_EOL;
+      \Filemon\printLine("...saving status", 0, 6);
       $em->flush($this);
     }
     return false;
