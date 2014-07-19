@@ -162,14 +162,14 @@ class File extends Entry {
   }
 
   public function toJson($level=1) {
-    \Filemon\printLine('{', $level);
+    \Filemon\printLine('{', $level, 0);
     $level++;
-    \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
-    \Filemon\printLine('"type": "file", "size": '.$this->size.',', $level);
+    \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level, 0);
+    \Filemon\printLine('"type": "file", "size": '.$this->size.',', $level, 0);
     if ($this->deleted) {
-      \Filemon\printLine('"deleted": '.$this->deleted.',', $level);
+      \Filemon\printLine('"deleted": '.$this->deleted.',', $level, 0);
     }
-    \Filemon\printLine('"mtime": '.$this->mtime.', "ctime": '.$this->ctime.',', $level);
+    \Filemon\printLine('"mtime": '.$this->mtime.', "ctime": '.$this->ctime.',', $level, 0);
     \Filemon\printLine('"tth": "'.$this->tth.'", '.
                        '"md5": "'.$this->md5.'", '.
                        '"crc32": "'.$this->crc32.'", '.
@@ -178,8 +178,8 @@ class File extends Entry {
                        '"sha3-256": "'.$this->sha3.'", '.
                        '"aich": "'.$this->aich.'", '.
                        '"btih": "'.$this->btih.'", '.
-                       '"ed2k": "'.$this->ed2k.'"', $level);
-    \Filemon\printLine('}', $level-1);
+                       '"ed2k": "'.$this->ed2k.'"', $level, 0);
+    \Filemon\printLine('}', $level-1, 0);
   }
 
   public function toXml($level=1, $inDeletedFolder=false) {
@@ -207,7 +207,7 @@ class File extends Entry {
         $suffix = "$suffix -->";
       }
     }
-    \Filemon\printLine($prefix.\Filemon\xmlEncode($data).$suffix, $level);
+    \Filemon\printLine($prefix.\Filemon\xmlEncode($data).$suffix, $level, 0);
   }
 
   public function getEd2kLink() {

@@ -176,30 +176,30 @@ class Folder extends Entry {
 
   public function toJson($level=1) {
     $first = true;
-    \Filemon\printLine('{', $level);
+    \Filemon\printLine('{', $level, 0);
     $level++;
-    \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level);
-    \Filemon\printLine('"type": "folder",', $level);
+    \Filemon\printLine('"name": '.\Filemon\jsonEncode($this->getName()).',', $level, 0);
+    \Filemon\printLine('"type": "folder",', $level, 0);
     if ($this->deleted) {
-      \Filemon\printLine('"deleted": '.$this->deleted.',', $level);
+      \Filemon\printLine('"deleted": '.$this->deleted.',', $level, 0);
     }
-    \Filemon\printLine('"items": [', $level);
+    \Filemon\printLine('"items": [', $level, 0);
     foreach ($this->getChilds() as $folder) {
       if (!$first) {
-        \Filemon\printLine(',', $level);
+        \Filemon\printLine(',', $level, 0);
       }
       $folder->toJson($level);
       $first = false;
     }
     foreach ($this->getFiles() as $file) {
       if (!$first) {
-        \Filemon\printLine(',', $level);
+        \Filemon\printLine(',', $level, 0);
       }
       $file->toJson($level);
       $first = false;
     }
-    \Filemon\printLine(']', $level);
-    \Filemon\printLine('}', $level-1);
+    \Filemon\printLine(']', $level, 0);
+    \Filemon\printLine('}', $level-1, 0);
   }
 
   public function toXml($level=1, $inDeletedFolder=false) {
@@ -216,13 +216,13 @@ class Folder extends Entry {
       }
       $inDeletedFolder = true;
     }
-    \Filemon\printLine($prefix.\Filemon\xmlEncode($data).'>', $level);
+    \Filemon\printLine($prefix.\Filemon\xmlEncode($data).'>', $level, 0);
     foreach ($this->getChilds() as $folder) {
       $folder->toXml($level+1, $inDeletedFolder);
     }
     foreach ($this->getFiles() as $file) {
       $file->toXml($level+1, $inDeletedFolder);
     }
-    \Filemon\printLine($suffix, $level);
+    \Filemon\printLine($suffix, $level, 0);
   }
 }
