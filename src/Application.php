@@ -32,6 +32,9 @@ class Application {
     } elseif (isset($opts['verbose'])) {
       $LOG_LEVEL = intval($opts['verbose']);
     }
+    if (!$LOG_LEVEL) {
+      $LOG_LEVEL = 3;
+    }
 
     switch ($opts['mode']) {
       case 'init':
