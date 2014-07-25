@@ -132,6 +132,7 @@ class Folder extends Entry {
       if ($k->getDeleted()) {
         \Filemon\printLine("...undeleted", 0, 4);
         $k->setDeleted(null);
+        $em->flush($k);
         $isUpdated = true;
       }
       if ($scanTime>5*60) {
@@ -147,6 +148,7 @@ class Folder extends Entry {
         $type = $f instanceof Folder ? 'folder' : 'file';
         \Filemon\printLine("Lost $type {$f->getName()}", 0, 4);
         $f->setDeleted($now);
+        $em->flush($f);
         $isUpdated = true;
       }
     }
