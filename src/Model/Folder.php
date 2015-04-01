@@ -242,11 +242,11 @@ class Folder extends Entry {
       /* @var $dirFile File*/
       $dirFile = $this->_findEntry($dirFiles[0], $file);
       if (!$dirFile) {
-        return;
+        continue;
       }
       if ($dirFile->getSize()==$file->getSize() && $dirFile->getMtime()!=$file->getMtime()) {
         $filePath = $this->root_path.'/'.$file->getName();
-        \Filemon\printLine("Touching $filePath (mtime: ".date('c', $dirFile->getMtime()).' -> '.date('c', $file->getMtime()).")", 0, 0);
+        \Filemon\printLine("Touching $filePath (mtime: ".date('c', $dirFile->getMtime()).' -> '.date('c', $file->getMtime()).")");
         touch($filePath, $file->getMtime());
       }
     }
