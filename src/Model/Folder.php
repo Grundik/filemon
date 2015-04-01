@@ -258,8 +258,9 @@ class Folder extends Entry {
     //$root = $rootMgr->find($this->getId());
     $path = array();
     $dir = $this;
-    while ( ($parent=$dir->getParent()) ) {
-      $path[] = $parent->getName();
+    while ( $dir->parent_id ) {
+      $path[] = $dir->getName();
+      $dir = $dir->getParent();
     }
     print_r($path);
   }
