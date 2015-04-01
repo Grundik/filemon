@@ -262,6 +262,7 @@ class Folder extends Entry {
       $path[] = $dir->getName();
       $dir = $dir->getParent();
     }
-    print_r($path);
+    $path[] = $dir->getName();
+    $this->setRootPath(join('/', array_reverse($path)));
   }
 }
