@@ -73,8 +73,14 @@ class Application {
       case 'magnet':
         echo $this->_findFile($opts)->getMagnetLink().PHP_EOL;
         break;
+      case 'updatemtime':
+        $this->updateMtime(isset($opts['path'])?$opts['path']:null);
+        break;
+      case 'help':
       default:
-        throw new \Exception("Unknown mode: {$opts['mode']}");
+        echo "Usage: ".$argv[0]." -mode <mode> [mode options]".PHP_EOL.
+             "".PHP_EOL;
+        //throw new \Exception("Unknown mode: {$opts['mode']}");
     }
   }
 
@@ -113,6 +119,17 @@ class Application {
       $root->scan($this->_entityMgr);
     });
   }
+
+  protected function updateMtime($path) {
+    $folderMgr = $this->_entityMgr->getRepository('Filemon\Model\Folder');
+
+    /* @var $folder \Filemon\Model\Folder */
+    foreach ($folderMgr->findBy(array('name'=>$path)) as $folder) {
+      $folder->findRootPath();
+      $folder->updateMtime();
+    }
+  }
+
 
   protected function _toJson($path) {
     \Filemon\printLine("[");

@@ -89,6 +89,10 @@ class File extends Entry {
     $this->mtime = $mtime;
   }
 
+  public function getMtime() {
+    return $this->mtime;
+  }
+
   public function setCtime($ctime) {
     $this->ctime = $ctime;
   }

@@ -9,12 +9,14 @@ class Folder extends Entry {
   /**
    * @OneToMany(targetEntity="Folder", mappedBy="parent", cascade="all")
    * @OrderBy({"name" = "ASC"})
+   * @var Folder[]
    */
   protected $childs;
 
   /**
    * @OneToMany(targetEntity="File", mappedBy="parent", cascade="all")
    * @OrderBy({"name" = "ASC"})
+   * @var File[]
    */
   protected $files;
 
@@ -93,6 +95,12 @@ class Folder extends Entry {
     return array($files, $folders);
   }
 
+  /**
+   *
+   * @param Entry[] $haystack
+   * @param Entry $entry
+   * @return Entry
+   */
   protected function _findEntry($haystack, $entry) {
     foreach ($haystack as $v) {
       if ($v->getName() === $entry->getName()) {
@@ -226,5 +234,33 @@ class Folder extends Entry {
       $file->toXml($level+1, $inDeletedFolder);
     }
     \Filemon\printLine($suffix, $level, 0);
+  }
+
+  public function updateMtime() {
+    $dirFiles = $this->_getDirStat($this->root_path);
+    foreach ($this->files as $file) {
+      /* @var $dirFile File*/
+      $dirFile = $this->_findEntry($dirFiles[0], $file);
+      if (!$dirFile) {
+        return;
+      }
+      if ($dirFile->getSize()==$file->getSize() && $dirFile->getMtime()!=$file->getMtime()) {
+        $filePath = $this->root_path.'/'.$file->getName();
+        \Filemon\printLine("Touching $filePath", 3, 0);
+        //touch($filePath, $file->getMtime());
+      }
+    }
+  }
+
+  public function findRootPath() {
+    //$rootMgr = $this->_entityMgr->getRepository('Filemon\\Model\\Root');
+    /* @var $root \Filemon\Model\Root */
+    //$root = $rootMgr->find($this->getId());
+    $path = array();
+    $dir = $this;
+    while ( ($parent=$dir->getParent()) ) {
+      $path[] = $parent->getName();
+    }
+    print_r($path);
   }
 }
