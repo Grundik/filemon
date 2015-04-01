@@ -246,8 +246,8 @@ class Folder extends Entry {
       }
       if ($dirFile->getSize()==$file->getSize() && $dirFile->getMtime()!=$file->getMtime()) {
         $filePath = $this->root_path.'/'.$file->getName();
-        \Filemon\printLine("Touching $filePath", 3, 0);
-        //touch($filePath, $file->getMtime());
+        \Filemon\printLine("Touching $filePath (mtime: ".date('c', $dirFile->getMtime()).' -> '.date('c', $file->getMtime()).")", 3, 0);
+        touch($filePath, $file->getMtime());
       }
     }
   }
