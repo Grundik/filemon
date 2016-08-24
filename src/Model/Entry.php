@@ -53,6 +53,9 @@ abstract class Entry {
     $this->parent = $parent;
   }
 
+  /**
+   * @return Entry
+   */
   public function getParent() {
     return $this->parent;
   }
@@ -63,5 +66,15 @@ abstract class Entry {
 
   public function setDeleted($deleted) {
     $this->deleted = $deleted;
+  }
+
+  public function getFullName() {
+    $path = [];
+    $parent = $this->getParent();
+    while ($parent) {
+      $path[] = $parent->getName();
+      $parent = $parent->getParent();
+    }
+    return join('/', array_reverse($path)).'/'.$this->getName();
   }
 }

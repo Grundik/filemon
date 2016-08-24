@@ -97,7 +97,7 @@ class File extends Entry {
     $this->ctime = $ctime;
   }
 
-  public function hash() {
+  public function calculateHash() {
     $hashtypes = array(
       'CRC32' => 'crc32',
       'MD5'   => 'md5',
@@ -119,6 +119,7 @@ class File extends Entry {
 
     $result = null;
     $status = null;
+    $hashes = null;
     \Filemon\printLine("...hashing", 0, 4);
     exec('rhash -TMCHAE --sha256 --sha3-256 --bsd --btih -- '.escapeshellarg($this->getName()), $result, $status);
     if (!$status) {
@@ -127,26 +128,73 @@ class File extends Entry {
           $hashtype = $matches[1];
           $hash = $matches[2];
           if (isset($hashtypes[$hashtype])) {
-            $this->{$hashtypes[$hashtype]} = strtoupper($hash);
+            $hashes[$hashtypes[$hashtype]] = strtoupper($hash);
           }
         }
       }
     }
 
     chdir($cwd);
+    return $hashes;
+  }
+
+  public function hash() {
+    foreach ($this->calculateHash() as $hashType=>$hashValue) {
+      $this->{$hashType} = $hashValue;
+    }
+  }
+
+  public function checkHash() {
+    $diff = array();
+    foreach ($this->calculateHash() as $hashType=>$hashValue) {
+      $savedHash = $this->{$hashType};
+      if ($savedHash !== $hashValue) {
+        $diff[] = "{$hashType} mismatch ({$savedHash} -> {$hashValue}";
+      }
+    }
+    return $diff;
   }
 
   public function update(File $entry) {
-    if ($this->mtime == $entry->mtime && $this->getSize() == $entry->getSize() &&
-        $this->btih
-       )
-    {
+    $changes = array();
+    if ($this->mtime != $entry->mtime) {
+      $changes[] = 'mtime changed '.$this->mtime.' -> '.$entry->mtime;
+    }
+    if ($this->getSize() != $entry->getSize()) {
+      $changes[] = 'size changed '.$this->getSize().' -> '.$entry->getSize();
+    }
+    if (!$this->btih) {
+      $changes[] = 'no BTIH calculated';
+    }
+    if (!$changes) {
       return false;
     }
+    \Filemon\printLine("...rehashing due to ".join(', ', $changes), 0, 4);
     $this->hash();
     $this->setMtime($entry->mtime);
     $this->setCtime($entry->ctime);
     $this->setSize($entry->getSize());
+    return true;
+  }
+
+  public function check(File $entry, $level) {
+    $changes = array();
+    if ($this->mtime != $entry->mtime) {
+      $changes[] = 'mtime '.$this->mtime.' -> '.$entry->mtime;
+    }
+    if ($this->getSize() != $entry->getSize()) {
+      $changes[] = 'size '.$this->getSize().' -> '.$entry->getSize();
+    }
+    if (!$this->btih) {
+      $changes[] = 'no BTIH calculated';
+    }
+    if (!$changes) {
+      return false;
+    }
+    if ($level>0) {
+      $changes = array_merge($changes, $this->checkHash());
+    }
+    \Filemon\printLine("File ".$this->getFullName()." changed: ".join(', ', $changes), 0, 1);
     return true;
   }
 
@@ -163,6 +211,15 @@ class File extends Entry {
       $isUpdated = true;
     }
     return $isUpdated;
+  }
+
+  public function doCheck($oldInstance, $level) {
+    if ($oldInstance) {
+      \Filemon\printLine("known file {$this->getName()}", 0, 5);
+      $this->check($oldInstance, $level);
+    } else {
+      \Filemon\printLine("new file {$this->getName()}", 0, 4);
+    }
   }
 
   public function toJson($level=1) {

@@ -5,6 +5,5 @@
   },
   "autoload": {
     "psr-4": {"Filemon\\": "./src/"}
-  },
-  "minimum-stability": "dev"
-}
+  }
+ }

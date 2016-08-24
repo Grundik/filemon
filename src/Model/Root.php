@@ -62,9 +62,14 @@ class Root {
     $mainfolder->setRootPath($dirname);
     return $mainfolder;
   }
+
   public function scan(\Doctrine\ORM\EntityManager $em) {
     $this->_getFolder()->scan($em);
     $em->flush();
+  }
+
+  public function check($level) {
+    $this->_getFolder()->check($level);
   }
 
   public function toJson($level=1) {

@@ -2,6 +2,7 @@
 
 namespace Filemon\Model;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 
 /** @Entity */
 class Folder extends Entry {
@@ -110,7 +111,7 @@ class Folder extends Entry {
     return null;
   }
 
-  public function doUpdate($oldInstance, Folder $container, \Doctrine\ORM\EntityManager $em) {
+  public function doUpdate($oldInstance, Folder $container, EntityManager $em) {
     $isUpdated = false;
     if ($oldInstance) {
       \Filemon\printLine("known folder {$this->getName()}", 0, 5);
@@ -123,7 +124,14 @@ class Folder extends Entry {
     return $this->scan($em) || $isUpdated;
   }
 
-  protected function _updateList($current, $saved, \Doctrine\ORM\EntityManager $em) {
+  public function doCheck($oldInstance, $level) {
+    if (!$oldInstance) {
+      \Filemon\printLine("new folder {$this->getName()}", 0, 4);
+    }
+    return $this->check($level);
+  }
+
+  protected function _updateList($current, $saved, EntityManager $em) {
     $isUpdated = false;
     $scanTime = 0;
     foreach ($current as $entry) {
@@ -163,7 +171,34 @@ class Folder extends Entry {
     return $isUpdated;
   }
 
-  public function scan(\Doctrine\ORM\EntityManager $em) {
+  /**
+   *
+   * @param Entry[] $current
+   * @param Entry[] $saved
+   * @param integer $level
+   * @return boolean
+   */
+  protected function _checkList($current, $saved, $level) {
+    foreach ($current as $entry) {
+      $k = $this->_findEntry($saved, $entry);
+      if (!$k) {
+        \Filemon\printLine("New entry: ".$entry->getFullName(), 0, 1);
+        continue;
+      }
+      $k->_found = true;
+      $k->doCheck($entry, $level);
+      if ($k->getDeleted()) {
+        \Filemon\printLine("Entry undeleted: ".$entry->getFullName(), 0, 1);
+      }
+    }
+    foreach ($saved as $f) {
+      if (!$f->_found && !$f->getDeleted()) {
+        \Filemon\printLine("Entry disappeared: ".$f->getFullName(), 0, 1);
+      }
+    }
+  }
+
+  public function scan(EntityManager $em) {
     if (!$this->root_path) {
       throw new \Exception('Internal error: root path not set');
     }
@@ -181,6 +216,21 @@ class Folder extends Entry {
       \Filemon\printLine("...saving status", 0, 6);
       $em->flush($this);
     }
+    return false;
+  }
+
+  public function check($level) {
+    if (!$this->root_path) {
+      throw new \Exception('Internal error: root path not set');
+    }
+    $folders = $this->getChilds();
+    $files = $this->getFiles();
+    $entries = $this->_getDirStat($this->root_path);
+    if (null===$entries) {
+      return false;
+    }
+    $this->_checkList($entries[0], $files, $level);
+    $this->_checkList($entries[1], $folders, $level);
     return false;
   }
 

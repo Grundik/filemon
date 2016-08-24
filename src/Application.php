@@ -22,7 +22,7 @@ class Application {
 
   public function run() {
     global $LOG_LEVEL;
-    $opts = getopt('h::m:v:', array('mode:', 'help', 'path:', 'file:', 'verbose:'));
+    $opts = getopt('h::m:v:l:', array('mode:', 'help', 'path:', 'file:', 'verbose:', 'level:'));
     if (!isset($opts['mode'])) {
       $opts['mode'] = isset($opts['m'])?$opts['m']:'update';
     }
@@ -34,6 +34,12 @@ class Application {
     }
     if (!$LOG_LEVEL) {
       $LOG_LEVEL = 3;
+    }
+    $level = 0;
+    if (isset($opts['l'])) {
+      $level = intval($opts['l']);
+    } elseif (isset($opts['level'])) {
+      $level = intval($opts['level']);
     }
 
     switch ($opts['mode']) {
@@ -76,6 +82,9 @@ class Application {
       case 'updatemtime':
         $this->updateMtime(isset($opts['path'])?$opts['path']:null);
         break;
+      case 'check':
+        $this->_checkPath(isset($opts['path'])?$opts['path']:null, $level);
+        break;
       case 'help':
       default:
         echo "Usage: ".$argv[0]." -mode <mode> [mode options]".PHP_EOL.
@@ -115,8 +124,14 @@ class Application {
   }
 
   protected function _scanPath($path) {
-    $this->_eachPath($path, function($root){
+    $this->_eachPath($path, function(Model\Root $root){
       $root->scan($this->_entityMgr);
+    });
+  }
+
+  protected function _checkPath($path, $level) {
+    $this->_eachPath($path, function(Model\Root $root) use ($level) {
+      $root->check($level);
     });
   }
 
