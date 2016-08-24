@@ -180,7 +180,7 @@ class File extends Entry {
   public function check(File $entry, $level) {
     $changes = array();
     if ($this->mtime != $entry->mtime) {
-      $changes[] = 'mtime '.$this->mtime.' -> '.$entry->mtime;
+      $changes[] = 'mtime '.date('c', $this->mtime).' -> '.date('c', $entry->mtime);
     }
     if ($this->getSize() != $entry->getSize()) {
       $changes[] = 'size '.$this->getSize().' -> '.$entry->getSize();
