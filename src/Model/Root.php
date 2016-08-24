@@ -59,7 +59,7 @@ class Root {
       $mainfolder->setName($dirname);
       $this->setFolder($mainfolder);
     }
-    $mainfolder->setRootPath($dirname);
+    $mainfolder->setRootPath(rtrim($dirname, '/'));
     return $mainfolder;
   }
 
