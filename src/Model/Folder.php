@@ -182,19 +182,19 @@ class Folder extends Entry {
     foreach ($current as $entry) {
       $k = $this->_findEntry($saved, $entry);
       if (!$k) {
-        \Filemon\printLine("New entry: ".$entry->getFullName(), 0, 1);
+        \Filemon\printLine("New entry: {$this->root_path}/{$entry->Name()}", 0, 1);
         continue;
       }
       $k->_found = true;
       $k->setRootPath($this->root_path.'/'.$k->getName());
       $k->doCheck($entry, $level);
       if ($k->getDeleted()) {
-        \Filemon\printLine("Entry undeleted: ".$entry->getFullName(), 0, 1);
+        \Filemon\printLine("Entry undeleted: {$this->root_path}/{$k->Name()}", 0, 1);
       }
     }
     foreach ($saved as $f) {
       if (!$f->_found && !$f->getDeleted()) {
-        \Filemon\printLine("Entry disappeared: ".$f->getFullName(), 0, 1);
+        \Filemon\printLine("Entry disappeared: {$this->root_path}/{$f->Name()}", 0, 1);
       }
     }
   }

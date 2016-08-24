@@ -67,14 +67,4 @@ abstract class Entry {
   public function setDeleted($deleted) {
     $this->deleted = $deleted;
   }
-
-  public function getFullName() {
-    $path = [];
-    $parent = $this->getParent();
-    while ($parent) {
-      $path[] = $parent->getName();
-      $parent = $parent->getParent();
-    }
-    return join('/', array_reverse($path)).'/'.$this->getName();
-  }
 }
