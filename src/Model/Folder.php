@@ -186,6 +186,7 @@ class Folder extends Entry {
         continue;
       }
       $k->_found = true;
+      $k->setRootPath($this->root_path.'/'.$k->getName());
       $k->doCheck($entry, $level);
       if ($k->getDeleted()) {
         \Filemon\printLine("Entry undeleted: ".$entry->getFullName(), 0, 1);
