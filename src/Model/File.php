@@ -194,7 +194,7 @@ class File extends Entry {
     if ($level>0) {
       $changes = array_merge($changes, $this->checkHash());
     }
-    \Filemon\printLine("File {$this->root_path}/{$this->name} changed: ".join(', ', $changes), 0, 1);
+    \Filemon\printLine("File {$this->root_path} changed: ".join(', ', $changes), 0, 1);
     return true;
   }
 
