@@ -153,7 +153,7 @@ class Folder extends Entry {
       }
       if ($scanTime>5*60) {
         \Filemon\printLine("...saving intermediate status", 0, 6);
-        $em->flush($this);
+        $em->flush();
         $scanTime = 0;
         $isUpdated = false;
       }
